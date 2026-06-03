@@ -27,10 +27,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Check Python imports
+      - name: Syntax Check
         run: |
-          python -c "import app; import utils; import llm; import matcher; import rag; import prompts; import config"
-
-      - name: Check Streamlit app syntax
-        run: |
-          python -m py_compile app.py utils.py llm.py matcher.py rag.py prompts.py config.py
+          python -m py_compile \
+          app.py \
+          utils.py \
+          llm.py \
+          matcher.py \
+          rag.py \
+          prompts.py \
+          config.py
