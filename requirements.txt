@@ -1,0 +1,12 @@
+streamlit 
+langchain 
+langchain-community 
+langchain-groq 
+langchain-huggingface 
+faiss-cpu 
+pypdf 
+python-dotenv 
+sentence-transformers
+python-docx
+torchvision
+scikit-learn
