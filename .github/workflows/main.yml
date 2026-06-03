@@ -1,0 +1,36 @@
+name: CI Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      GROQ_API_KEY: dummy_key_for_ci
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check Python imports
+        run: |
+          python -c "import app; import utils; import llm; import matcher; import rag; import prompts; import config"
+
+      - name: Check Streamlit app syntax
+        run: |
+          python -m py_compile app.py utils.py llm.py matcher.py rag.py prompts.py config.py
