@@ -1,5 +1,5 @@
 import os
-import streamlit as st
+
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 
@@ -7,7 +7,12 @@ load_dotenv()
 
 
 def get_api_key():
-    return st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
+
+    if not api_key:
+        raise ValueError("GROQ_API_KEY not found. Check your .env or Streamlit secrets.")
+
+    return api_key
 
 
 def get_llm():

@@ -122,6 +122,14 @@ Rank 3:
 Field: ...
 Confidence: ...%
 
+Best Target Role:
+...
+
+Other Suitable Roles:
+- ...
+- ...
+- ...
+
 Recommended Roles:
 - ...
 - ...
@@ -144,6 +152,32 @@ Next Learning Steps:
 
 Best Project To Build Next:
 ...
+"""
+)
+
+market_skill_extraction_prompt = ChatPromptTemplate.from_template(
+    """
+You are an expert job market analyst.
+
+Extract the most important technical skills, tools, frameworks, libraries, platforms, and qualifications from these job descriptions.
+
+Return ONLY valid JSON in this format:
+{{
+  "skills": ["skill1", "skill2", "skill3"]
+}}
+
+Rules:
+- Focus only on job-required skills.
+- Ignore company descriptions, benefits, HR text, salary, location, and generic soft skills.
+- Normalize abbreviations:
+  ML = Machine Learning
+  DL = Deep Learning
+  AI = Artificial Intelligence
+- Keep only unique skills.
+- Return maximum 30 skills.
+
+Job Descriptions:
+{text}
 """
 )
 

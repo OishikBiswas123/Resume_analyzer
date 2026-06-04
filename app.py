@@ -1,11 +1,11 @@
 import streamlit as st
-
+import re
 from utils import (
     extract_text_from_pdf,
     extract_text_from_docx
 )
 
-from llm import extract_skills_list, generate_match_explanation,  predict_career_field
+from llm import extract_skills_list, generate_match_explanation,  predict_career_field,extract_market_skills
 from rag import create_vector_store, answer_resume_question
 
 from matcher import (
@@ -13,7 +13,11 @@ from matcher import (
     calculate_semantic_similarity,
     calculate_final_score
 )
-
+from job_market import (
+    fetch_jobs,
+    combine_job_descriptions,
+    calculate_market_fit
+)
 st.set_page_config(
     page_title="AI Resume Analyzer",
     page_icon="📄",
@@ -42,6 +46,12 @@ if "vector_store" not in st.session_state:
 if "resume_text" not in st.session_state:
     st.session_state.resume_text = ""
 
+if "predicted_role" not in st.session_state:
+    st.session_state.predicted_role = ""
+
+if "career_result" not in st.session_state:
+    st.session_state.career_result = ""
+
 uploaded_resume = st.file_uploader(
     "Upload Resume",
     type=["pdf", "docx"]
@@ -60,11 +70,12 @@ if uploaded_resume:
 
     st.success("Resume uploaded and text extracted successfully.")
 
-    tab1, tab2, tab3, tab4 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📄 Resume Text",
     "🎯 Job Match",
     "💬 Resume Q&A",
-    "🚀 Career Path Predictor"
+    "🚀 Career Path Predictor",
+    "📈 Market Analysis"
 ])
 
     with tab1:
@@ -199,12 +210,129 @@ if uploaded_resume:
             "Use this if you do not have a job description and want AI to suggest the best career direction based on your resume."
         )
 
+        if st.session_state.career_result:
+
+            st.subheader("Last Career Analysis")
+            
+            st.write(st.session_state.career_result)
+
         if st.button("Predict Best Career Path"):
+
             with st.spinner("Analyzing resume and predicting career path..."):
                 career_result = predict_career_field(resume_text)
 
-                st.subheader("AI Career Path Analysis")
-                st.write(career_result)
+            st.session_state.career_result = career_result
 
+            predicted_role = ""
+
+            match = re.search(
+                r"Best Target Role\s*:\s*(.+)",
+                career_result,
+                re.IGNORECASE
+            )
+
+            if match:
+                predicted_role = match.group(1).strip()
+                st.session_state.predicted_role = predicted_role
+
+            st.subheader("AI Career Path Analysis")
+            st.write(career_result)
+
+            if predicted_role:
+                st.success(
+                    f"Suggested Role: {predicted_role}"
+                )
+            else:
+                st.warning(
+                    "Could not extract a target role from the AI response."
+                )
+    with tab5:
+        st.subheader("Live Job Market Analysis")
+
+        st.write(
+            "Enter a target role manually, or use the Career Path Predictor tab to decide which role to analyze."
+        )
+
+        role = st.text_input(
+            "Target Role",
+            value=st.session_state.predicted_role
+        )
+
+        if st.button("Analyze Market Demand"):
+
+            with st.spinner("Fetching current job market data..."):
+
+                jobs = fetch_jobs(role)
+
+                if not jobs:
+                    st.error("Could not fetch job data.")
+                    st.stop()
+
+                job_text = combine_job_descriptions(jobs)
+
+                market_skills = extract_market_skills(job_text)
+                market_skills = market_skills[:30]
+
+                resume_skills = extract_skills_list(resume_text)
+
+                market_score, matched, missing = calculate_market_fit(
+                    resume_skills,
+                    market_skills
+                )
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.metric(
+                    "Market Fit Score",
+                    f"{market_score}%"
+                )
+
+            with col2:
+                st.metric(
+                    "Matched Skills",
+                    f"{len(matched)}/{len(market_skills)}"
+                )
+
+            st.write(
+                f"You match **{len(matched)} out of {len(market_skills)}** current market skills for **{role}**."
+            )
+
+            st.subheader("Top Skills To Learn Next")
+
+            if missing:
+                for skill in missing[:5]:
+                    st.warning(skill)
+            else:
+                st.success("You have covered all major market skills.")
+
+            st.divider()
+
+            col3, col4 = st.columns(2)
+
+            with col3:
+                st.subheader("Skills You Already Have")
+
+                if matched:
+                    for skill in matched:
+                        st.success(skill)
+                else:
+                    st.warning("No matching skills found.")
+
+            with col4:
+                st.subheader("Skills Missing In Current Market")
+
+                if missing:
+                    for skill in missing[:10]:
+                        st.error(skill)
+
+                    if len(missing) > 10:
+                        st.info(f"+ {len(missing) - 10} more skills not shown.")
+                else:
+                    st.success("No missing skills found.")
+
+            with st.expander("View Current Market Skills"):
+                for skill in market_skills:
+                    st.info(skill)
 else:
     st.info("Please upload a PDF or DOCX resume to begin.")

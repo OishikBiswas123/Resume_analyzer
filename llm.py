@@ -7,7 +7,8 @@ from config import get_llm
 from prompts import (
     skill_extraction_prompt,
     match_explanation_prompt,
-    career_prediction_prompt
+    career_prediction_prompt,
+    market_skill_extraction_prompt
 )
 
 
@@ -48,6 +49,19 @@ def predict_career_field(resume_text):
     })
 
     return response
+
+def extract_market_skills(text):
+    llm = get_llm()
+
+    chain = market_skill_extraction_prompt | llm | StrOutputParser()
+
+    response = chain.invoke({
+        "text": text
+    })
+
+    data = parse_json_response(response)
+
+    return [skill.lower().strip() for skill in data.get("skills", [])]
 
 
 def generate_match_explanation(
