@@ -1,9 +1,28 @@
 import json
+import re
 
 from langchain_core.output_parsers import StrOutputParser
 
 from config import get_llm
-from prompts import skill_extraction_prompt, match_explanation_prompt,career_prediction_prompt
+from prompts import (
+    skill_extraction_prompt,
+    match_explanation_prompt,
+    career_prediction_prompt
+)
+
+
+def parse_json_response(response):
+    try:
+        return json.loads(response)
+
+    except json.JSONDecodeError:
+        json_match = re.search(r"\{.*\}", response, re.DOTALL)
+
+        if json_match:
+            return json.loads(json_match.group())
+
+        return {"skills": []}
+
 
 def extract_skills_list(text):
     llm = get_llm()
@@ -14,9 +33,10 @@ def extract_skills_list(text):
         "text": text
     })
 
-    data = json.loads(response)
+    data = parse_json_response(response)
 
-    return [skill.lower().strip() for skill in data["skills"]]
+    return [skill.lower().strip() for skill in data.get("skills", [])]
+
 
 def predict_career_field(resume_text):
     llm = get_llm()
@@ -28,6 +48,7 @@ def predict_career_field(resume_text):
     })
 
     return response
+
 
 def generate_match_explanation(
     resume_text,
