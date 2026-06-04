@@ -1,4 +1,4 @@
-# AI Resume Analyzer
+# AI Resume Analyzer & Career Path Predictor
 
 AI Resume Analyzer is a Streamlit-based NLP and RAG application that analyzes resumes, extracts skills, compares them with a job description, calculates a job match score, and allows users to ask questions about the resume using FAISS-based retrieval.
 
@@ -15,6 +15,10 @@ AI Resume Analyzer is a Streamlit-based NLP and RAG application that analyzes re
 - FAISS vector database
 - Resume question-answering using RAG
 
+## New Feature: Career Path Predictor
+
+If a user does not have a target job description,the AI analyzes skills, projects, and experience to recommend the most suitable career path,potential roles, skill gaps, and next learning steps.
+
 ## Tech Stack
 
 - Python
@@ -27,7 +31,9 @@ AI Resume Analyzer is a Streamlit-based NLP and RAG application that analyzes re
 - PyPDF
 - python-docx
 - Scikit-learn
-
+- RAG
+- GitHub Actions
+- CI/CD
 
 ## Project Structure
 
