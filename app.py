@@ -29,19 +29,18 @@ from job_market import (
 
 
 def extract_best_target_role(career_result):
-    lines = career_result.splitlines()
+    text = career_result.replace("*", "").strip()
 
-    for line in lines:
-        clean_line = line.strip().replace("*", "")
+    match = re.search(
+        r"Best\s+Target\s+Role\s*:\s*([^\n\r]+)",
+        text,
+        re.IGNORECASE
+    )
 
-        if "best target role" in clean_line.lower():
-            if ":" in clean_line:
-                role = clean_line.split(":", 1)[1].strip()
-
-                role = role.replace('"', "").replace("'", "").strip()
-
-                if role:
-                    return role
+    if match:
+        role = match.group(1).strip()
+        role = role.replace('"', "").replace("'", "")
+        return role
 
     return ""
 
