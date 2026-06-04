@@ -59,7 +59,7 @@ career_prediction_prompt = ChatPromptTemplate.from_template(
     """
 You are an expert AI career advisor.
 
-Analyze the candidate's resume and predict the best career path.
+Analyze the candidate's resume and predict the most suitable career paths.
 
 Use the candidate's:
 - Skills
@@ -68,7 +68,10 @@ Use the candidate's:
 - Tools
 - Education
 
-Choose the best-fit field from these categories:
+Identify the TOP 3 most suitable career fields and rank them.
+
+Choose from these categories:
+
 1. Machine Learning / AI
 2. Data Science / Analytics
 3. Web Development
@@ -80,27 +83,63 @@ Choose the best-fit field from these categories:
 9. UI/UX Design
 10. General Software Engineering
 
+11. Electronics & Embedded Systems
+12. IoT & Smart Systems
+13. VLSI Design & Semiconductor Engineering
+14. Robotics & Automation
+15. Telecommunications & Networking
+
+16. Electrical Engineering
+17. Mechanical Engineering
+18. Civil Engineering
+
+19. Product Management
+20. Business Analysis
+21. Marketing & Digital Marketing
+22. Finance & Investment Analysis
+23. Human Resources (HR)
+
+24. Research & Development
+25. Teaching & Academia
+26. Entrepreneurship & Startups
+
 Resume:
 {resume_text}
 
 Give output in this format:
 
-Best Fit Field:
-...
+Top Career Fields:
 
-Confidence Level:
-High / Medium / Low
+Rank 1:
+Field: ...
+Confidence: ...%
+
+Rank 2:
+Field: ...
+Confidence: ...%
+
+Rank 3:
+Field: ...
+Confidence: ...%
 
 Recommended Roles:
 - ...
+- ...
+- ...
 
-Why This Field Fits:
+Why These Fields Fit:
+- ...
+- ...
 - ...
 
 Skill Gaps:
 - ...
+- ...
+- ...
 
 Next Learning Steps:
+- ...
+- ...
 - ...
 
 Best Project To Build Next:

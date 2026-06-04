@@ -203,7 +203,7 @@ if uploaded_resume:
             with st.spinner("Analyzing resume and predicting career path..."):
                 career_result = predict_career_field(resume_text)
 
-                st.subheader("Career Recommendation")
+                st.subheader("AI Career Path Analysis")
                 st.write(career_result)
 
 else:
