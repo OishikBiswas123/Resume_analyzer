@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Resume Analyzer</string>
+    <string name="error_title">Connection Error</string>
+    <string name="error_loading">Unable to load the app.\n%s</string>
+    <string name="unknown_error">Unknown error occurred</string>
+    <string name="retry">Retry</string>
+
+    <!-- ⚠️ UPDATE THIS after deploying to Streamlit Cloud -->
+    <string name="app_url">https://YOUR_APP_NAME.streamlit.app</string>
+</resources>
