@@ -51,20 +51,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Hide Streamlit footer and deploy button only (keep header visible)
-hide_streamlit_style = """
-    <style>
-        footer {visibility: hidden !important;}
-        .stDeployButton {display: none !important;}
-        div[data-testid="stToolbar"] {display: none !important;}
-        div[data-testid="stDecoration"] {display: none !important;}
-        [data-testid="stStatusWidget"] {display: none !important;}
-        .viewerBadge_container__1QSob {display: none !important;}
-        iframe[title="streamlit_footer"] {display: none !important;}
-    </style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-
 with st.sidebar:
     st.title("📄 Resume Analyzer")
     st.markdown("""
