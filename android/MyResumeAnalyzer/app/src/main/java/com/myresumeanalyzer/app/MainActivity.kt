@@ -3,6 +3,8 @@ package com.myresumeanalyzer.app
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -18,7 +20,6 @@ import com.google.android.material.button.MaterialButton
 class MainActivity : AppCompatActivity() {
 
     companion object {
-        // ⚠️ UPDATE THIS URL after deploying your Streamlit app to Streamlit Cloud
         private const val APP_URL = "https://resumeanalyzer-tdc8xvnbegkgzn6fg5pwmt.streamlit.app"
     }
 
@@ -28,6 +29,90 @@ class MainActivity : AppCompatActivity() {
     private lateinit var errorView: View
     private lateinit var errorText: TextView
     private lateinit var retryButton: MaterialButton
+    private val mainHandler = Handler(Looper.getMainLooper())
+
+    // JavaScript to hide Streamlit footer elements robustly (via evaluateJavascript)
+    private val footerHidingScript = """
+        (function() {
+            function hideFooterElements() {
+                var allElements = document.querySelectorAll('a, div, footer, span, section, p');
+                var found = false;
+                for (var i = 0; i < allElements.length; i++) {
+                    var el = allElements[i];
+                    var text = (el.textContent || el.innerText || '').trim();
+                    var html = (el.innerHTML || '').toLowerCase();
+                    if (text.indexOf('Hosted with Streamlit') > -1 ||
+                        text.indexOf('Created by') > -1 ||
+                        html.indexOf('hosted with streamlit') > -1 ||
+                        html.indexOf('created by') > -1) {
+                        el.style.display = 'none';
+                        el.style.visibility = 'hidden';
+                        el.style.height = '0px';
+                        el.style.overflow = 'hidden';
+                        el.setAttribute('hidden', '');
+                        found = true;
+                    }
+                }
+                if (found) {
+                    console.log('[FooterHider] Found and hid footer elements');
+                }
+                return found;
+            }
+
+            // Run immediately
+            hideFooterElements();
+
+            // Run on delays (Streamlit loads content dynamically)
+            setTimeout(function() { hideFooterElements(); }, 1000);
+            setTimeout(function() { hideFooterElements(); }, 2000);
+            setTimeout(function() { hideFooterElements(); }, 3000);
+            setTimeout(function() { hideFooterElements(); }, 5000);
+            setTimeout(function() { hideFooterElements(); }, 8000);
+
+            // MutationObserver to catch dynamically loaded content
+            var targetNode = document.body || document.documentElement;
+            if (targetNode) {
+                var observer = new MutationObserver(function(mutations) {
+                    hideFooterElements();
+                });
+                observer.observe(targetNode, {
+                    childList: true,
+                    subtree: true,
+                    attributes: false,
+                    characterData: false
+                });
+            }
+        })();
+    """.trimIndent()
+
+    // JavaScript to hide footer via loadUrl with javascript: scheme (backup)
+    private val footerHidingUrl = "javascript:" + """
+        (function() {
+            function hideFooterElements() {
+                var elements = document.querySelectorAll('a, div, footer, span, section, p');
+                for (var i = 0; i < elements.length; i++) {
+                    var el = elements[i];
+                    var text = (el.textContent || el.innerText || '').trim();
+                    var html = (el.innerHTML || '').toLowerCase();
+                    if (text.indexOf('Hosted with Streamlit') > -1 ||
+                        text.indexOf('Created by') > -1 ||
+                        html.indexOf('hosted with streamlit') > -1 ||
+                        html.indexOf('created by') > -1) {
+                        el.style.display = 'none';
+                        el.style.visibility = 'hidden';
+                        el.style.height = '0px';
+                        el.style.overflow = 'hidden';
+                        el.setAttribute('hidden', '');
+                    }
+                }
+            }
+            hideFooterElements();
+            setTimeout(hideFooterElements, 2000);
+            setTimeout(hideFooterElements, 5000);
+            var o = new MutationObserver(function(){hideFooterElements();});
+            o.observe(document.body||document.documentElement, {childList:true,subtree:true});
+        })();
+    """.trimIndent().replace("\n", "")
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,21 +164,28 @@ class MainActivity : AppCompatActivity() {
                 webView.visibility = View.VISIBLE
                 swipeRefreshLayout.isRefreshing = false
 
-                // Hide Streamlit footer by targeting anchor elements containing footer text
-                view?.evaluateJavascript(
-                    "(function(){" +
-                    "function h(){" +
-                    "var a=document.querySelectorAll('a');" +
-                    "for(var i=0;i<a.length;i++){" +
-                    "var t=a[i].textContent||'';" +
-                    "if(t.indexOf('Hosted with Streamlit')>-1||t.indexOf('Created by')>-1){" +
-                    "a[i].style.display='none';" +
-                    "}}}" +
-                    "h();" +
-                    "setTimeout(h,2000);" +
-                    "})();",
-                    null
-                )
+                // Method 1: evaluateJavascript (modern API)
+                injectFooterHidingJS()
+
+                // Method 2: loadUrl with javascript: scheme (backup, runs on delay)
+                mainHandler.postDelayed({
+                    try {
+                        webView.loadUrl(footerHidingUrl)
+                    } catch (e: Exception) {
+                        // Silently fail - method 1 should work
+                    }
+                }, 500)
+
+                // Method 3: Repeated injections to catch late-loading content
+                mainHandler.postDelayed({
+                    injectFooterHidingJS()
+                    try { webView.loadUrl(footerHidingUrl) } catch (_: Exception) {}
+                }, 3000)
+
+                mainHandler.postDelayed({
+                    injectFooterHidingJS()
+                    try { webView.loadUrl(footerHidingUrl) } catch (_: Exception) {}
+                }, 6000)
             }
 
             override fun onReceivedError(
@@ -103,7 +195,6 @@ class MainActivity : AppCompatActivity() {
             ) {
                 super.onReceivedError(view, request, error)
 
-                // Only show error view for the main frame
                 if (request?.isForMainFrame == true) {
                     progressBar.visibility = View.GONE
                     webView.visibility = View.GONE
@@ -119,7 +210,6 @@ class MainActivity : AppCompatActivity() {
                 view: WebView?,
                 request: WebResourceRequest?
             ): Boolean {
-                // Keep all navigation inside the WebView
                 return false
             }
         }
@@ -129,6 +219,17 @@ class MainActivity : AppCompatActivity() {
                 super.onProgressChanged(view, newProgress)
                 progressBar.progress = newProgress
             }
+        }
+    }
+
+    private fun injectFooterHidingJS() {
+        try {
+            webView.evaluateJavascript(footerHidingScript, null)
+        } catch (e: Exception) {
+            // Fallback to loadUrl method
+            try {
+                webView.loadUrl(footerHidingUrl)
+            } catch (_: Exception) {}
         }
     }
 
@@ -163,5 +264,10 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mainHandler.removeCallbacksAndMessages(null)
     }
 }
