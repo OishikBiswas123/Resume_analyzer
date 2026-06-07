@@ -79,13 +79,35 @@ class MainActivity : AppCompatActivity() {
                 webView.visibility = View.VISIBLE
                 swipeRefreshLayout.isRefreshing = false
 
-                // Hide only the Streamlit footer
+                // Hide Streamlit footer by text content and iframe
                 view?.evaluateJavascript(
                     "(function(){" +
-                    "var s=document.createElement('style');" +
-                    "s.innerHTML='footer{display:none!important}';" +
-                    "document.head.appendChild(s);" +
+                    "var el=document.querySelectorAll('a,p,div,section');" +
+                    "for(var i=0;i<el.length;i++){" +
+                    "var e=el[i];" +
+                    "if(e.innerText&&(e.innerText.indexOf('Hosted with Streamlit')>-1||" +
+                    "e.innerText.indexOf('Created by')>-1||" +
+                    "e.innerText.indexOf('streamlit_footer')>-1)){" +
+                    "e.style.display='none';" +
+                    "}" +
+                    "}" +
+                    "var f=document.querySelector('iframe[title=streamlit_footer]');" +
+                    "if(f)f.style.display='none';" +
                     "})();",
+                    null
+                )
+                // Run again after a delay for dynamic content
+                view?.evaluateJavascript(
+                    "setTimeout(function(){" +
+                    "var el=document.querySelectorAll('a,p,div,section');" +
+                    "for(var i=0;i<el.length;i++){" +
+                    "var e=el[i];" +
+                    "if(e.innerText&&(e.innerText.indexOf('Hosted with Streamlit')>-1||" +
+                    "e.innerText.indexOf('Created by')>-1)){" +
+                    "e.style.display='none';" +
+                    "}" +
+                    "}" +
+                    "},2000);",
                     null
                 )
             }

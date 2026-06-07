@@ -51,10 +51,29 @@ st.set_page_config(
     layout="wide"
 )
 
-# Hide only the Streamlit footer
+# Hide the Streamlit footer using JavaScript (targeting by text content)
 st.markdown("""
+    <script>
+        function hideStreamlitFooter() {
+            var elements = document.querySelectorAll('a, p, div, section');
+            for (var i = 0; i < elements.length; i++) {
+                var el = elements[i];
+                if (el.innerText && (
+                    el.innerText.indexOf('Hosted with Streamlit') !== -1 ||
+                    el.innerText.indexOf('Created by') !== -1 ||
+                    el.innerText.indexOf('streamlit_footer') !== -1
+                )) {
+                    el.style.display = 'none';
+                }
+            }
+        }
+        // Run on load and after dynamic updates
+        window.addEventListener('load', hideStreamlitFooter);
+        setTimeout(hideStreamlitFooter, 2000);
+        setTimeout(hideStreamlitFooter, 5000);
+    </script>
     <style>
-        footer {display: none !important;}
+        iframe[title="streamlit_footer"] {display: none !important;}
     </style>
 """, unsafe_allow_html=True)
 
