@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         // ⚠️ UPDATE THIS URL after deploying your Streamlit app to Streamlit Cloud
-        private const val APP_URL = "https://YOUR_APP_NAME.streamlit.app"
+        private const val APP_URL = "https://resumeanalyzer-tdc8xvnbegkgzn6fg5pwmt.streamlit.app"
     }
 
     private lateinit var webView: WebView
@@ -78,6 +78,16 @@ class MainActivity : AppCompatActivity() {
                 progressBar.visibility = View.GONE
                 webView.visibility = View.VISIBLE
                 swipeRefreshLayout.isRefreshing = false
+
+                // Hide only the Streamlit footer
+                view?.evaluateJavascript(
+                    "(function(){" +
+                    "var s=document.createElement('style');" +
+                    "s.innerHTML='footer{display:none!important}';" +
+                    "document.head.appendChild(s);" +
+                    "})();",
+                    null
+                )
             }
 
             override fun onReceivedError(

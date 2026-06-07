@@ -51,6 +51,13 @@ st.set_page_config(
     layout="wide"
 )
 
+# Hide only the Streamlit footer
+st.markdown("""
+    <style>
+        footer {display: none !important;}
+    </style>
+""", unsafe_allow_html=True)
+
 with st.sidebar:
     st.title("📄 Resume Analyzer")
     st.markdown("""
