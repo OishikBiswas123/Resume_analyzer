@@ -51,11 +51,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# Hide Streamlit default UI elements (header toolbar, footer, deploy button)
+# Hide Streamlit footer and deploy button only (keep header visible)
 hide_streamlit_style = """
     <style>
-        #MainMenu {visibility: hidden !important;}
-        header {visibility: hidden !important;}
         footer {visibility: hidden !important;}
         .stDeployButton {display: none !important;}
         div[data-testid="stToolbar"] {display: none !important;}

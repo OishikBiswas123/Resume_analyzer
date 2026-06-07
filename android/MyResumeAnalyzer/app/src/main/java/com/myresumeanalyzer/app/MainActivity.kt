@@ -79,13 +79,11 @@ class MainActivity : AppCompatActivity() {
                 webView.visibility = View.VISIBLE
                 swipeRefreshLayout.isRefreshing = false
 
-                // Inject CSS to hide Streamlit UI elements (backup to server-side CSS)
+                // Inject CSS to hide Streamlit footer & toolbar only (keep header visible)
                 view?.evaluateJavascript(
                     "(function() {" +
                     "var s = document.createElement('style');" +
                     "s.innerHTML = '" +
-                    "#MainMenu{display:none!important}" +
-                    "header{display:none!important}" +
                     "footer{display:none!important}" +
                     ".stDeployButton{display:none!important}" +
                     "div[data-testid=stToolbar]{display:none!important}" +
