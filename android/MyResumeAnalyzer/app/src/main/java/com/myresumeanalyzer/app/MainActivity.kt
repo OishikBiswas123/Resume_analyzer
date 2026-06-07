@@ -79,23 +79,22 @@ class MainActivity : AppCompatActivity() {
                 webView.visibility = View.VISIBLE
                 swipeRefreshLayout.isRefreshing = false
 
-                // Inject CSS to hide Streamlit UI elements
+                // Inject CSS to hide Streamlit UI elements (backup to server-side CSS)
                 view?.evaluateJavascript(
-                    """(function() {
-                        var style = document.createElement('style');
-                        style.innerHTML = `
-                            #MainMenu {display: none !important;}
-                            header {display: none !important;}
-                            footer {display: none !important;}
-                            .stDeployButton {display: none !important;}
-                            div[data-testid="stToolbar"] {display: none !important;}
-                            div[data-testid="stDecoration"] {display: none !important;}
-                            [data-testid="stStatusWidget"] {display: none !important;}
-                            .viewerBadge_container__1QSob {display: none !important;}
-                            iframe[title="streamlit_footer"] {display: none !important;}
-                        `;
-                        document.head.appendChild(style);
-                    })()""",
+                    "(function() {" +
+                    "var s = document.createElement('style');" +
+                    "s.innerHTML = '" +
+                    "#MainMenu{display:none!important}" +
+                    "header{display:none!important}" +
+                    "footer{display:none!important}" +
+                    ".stDeployButton{display:none!important}" +
+                    "div[data-testid=stToolbar]{display:none!important}" +
+                    "div[data-testid=stDecoration]{display:none!important}" +
+                    "[data-testid=stStatusWidget]{display:none!important}" +
+                    ".viewerBadge_container__1QSob{display:none!important}" +
+                    "iframe[title=streamlit_footer]{display:none!important}';" +
+                    "document.head.appendChild(s);" +
+                    "})();",
                     null
                 )
             }

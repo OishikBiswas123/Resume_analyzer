@@ -55,26 +55,14 @@ st.set_page_config(
 hide_streamlit_style = """
     <style>
         #MainMenu {visibility: hidden !important;}
-        header {visibility: hidden !important; display: none !important;}
-        footer {visibility: hidden !important; display: none !important;}
-        .stDeployButton {display: none !important; visibility: hidden !important;}
-        div[data-testid="stToolbar"] {display: none !important; visibility: hidden !important;}
-        div[data-testid="stDecoration"] {display: none !important; visibility: hidden !important;}
-        section[data-testid="stSidebar"] .css-1lcbmhc {display: none !important;}
+        header {visibility: hidden !important;}
+        footer {visibility: hidden !important;}
+        .stDeployButton {display: none !important;}
+        div[data-testid="stToolbar"] {display: none !important;}
+        div[data-testid="stDecoration"] {display: none !important;}
         [data-testid="stStatusWidget"] {display: none !important;}
         .viewerBadge_container__1QSob {display: none !important;}
-        .stApp header {display: none !important;}
-        .stAppToolbar {display: none !important;}
-        .css-1rs6os {visibility: hidden !important;}
-        .css-17lntkn {display: none !important;}
-        .css-1dp5vir {display: none !important;}
-        .css-1l02no {display: none !important;}
         iframe[title="streamlit_footer"] {display: none !important;}
-        .st-emotion-cache-1wbqy5l {display: none !important;}
-        .st-emotion-cache-1v7f65g {display: none !important;}
-        .st-emotion-cache-1dp5vir {display: none !important;}
-        .st-emotion-cache-zq5wmm {display: none !important;}
-        .st-emotion-cache-1rs6os {display: none !important;}
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
