@@ -79,35 +79,19 @@ class MainActivity : AppCompatActivity() {
                 webView.visibility = View.VISIBLE
                 swipeRefreshLayout.isRefreshing = false
 
-                // Hide Streamlit footer by text content and iframe
+                // Hide Streamlit footer by targeting anchor elements containing footer text
                 view?.evaluateJavascript(
                     "(function(){" +
-                    "var el=document.querySelectorAll('a,p,div,section');" +
-                    "for(var i=0;i<el.length;i++){" +
-                    "var e=el[i];" +
-                    "if(e.innerText&&(e.innerText.indexOf('Hosted with Streamlit')>-1||" +
-                    "e.innerText.indexOf('Created by')>-1||" +
-                    "e.innerText.indexOf('streamlit_footer')>-1)){" +
-                    "e.style.display='none';" +
-                    "}" +
-                    "}" +
-                    "var f=document.querySelector('iframe[title=streamlit_footer]');" +
-                    "if(f)f.style.display='none';" +
+                    "function h(){" +
+                    "var a=document.querySelectorAll('a');" +
+                    "for(var i=0;i<a.length;i++){" +
+                    "var t=a[i].textContent||'';" +
+                    "if(t.indexOf('Hosted with Streamlit')>-1||t.indexOf('Created by')>-1){" +
+                    "a[i].style.display='none';" +
+                    "}}}" +
+                    "h();" +
+                    "setTimeout(h,2000);" +
                     "})();",
-                    null
-                )
-                // Run again after a delay for dynamic content
-                view?.evaluateJavascript(
-                    "setTimeout(function(){" +
-                    "var el=document.querySelectorAll('a,p,div,section');" +
-                    "for(var i=0;i<el.length;i++){" +
-                    "var e=el[i];" +
-                    "if(e.innerText&&(e.innerText.indexOf('Hosted with Streamlit')>-1||" +
-                    "e.innerText.indexOf('Created by')>-1)){" +
-                    "e.style.display='none';" +
-                    "}" +
-                    "}" +
-                    "},2000);",
                     null
                 )
             }
